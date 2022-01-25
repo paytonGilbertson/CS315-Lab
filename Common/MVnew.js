@@ -155,11 +155,11 @@ function vec4()
 
 
       case 2:
-        if(typeof(arguments[0])=='number'&&arguments[1].type == 'vec3') {
-          out[0] = arguments[0];
-          out[1] = arguments[1][0];
-          out[2] = arguments[1][1];
-          out[3] = arguments[1][2];
+        if(typeof(arguments[1])=='number'&&arguments[0].type == 'vec3') {
+          out[3] = arguments[1];
+          out[0] = arguments[0][0];
+          out[1] = arguments[0][1];
+          out[2] = arguments[0][2];
           return out;
       }
       return out;
@@ -766,7 +766,7 @@ function cross( u, v )
       return result;
     }
 
-    if ( v.type == 'vec4' && v.type == 'vec4') {
+    if ( u.type == 'vec4' && v.type == 'vec4') {
       var result = vec3(
           u[1]*v[2] - u[2]*v[1],
           u[2]*v[0] - u[0]*v[2],
@@ -789,43 +789,37 @@ function length( u )
 
 function normalize( u, excludeLastComponent )
 {
-    if(u.type != 'vec3' && u.type != 'vec4') {
-
-      throw "normalize: not a vector type";
-    }
-    switch(u.type) {
+   let result;
+   switch(u.type) {
       case 'vec2':
-        var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]);
-        var result = vec2(u[0]/len, u[1]/len);
-        return result;
-      break;
+         var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]);
+         result = vec2(u[0]/len, u[1]/len);
+         break;
       case 'vec3':
-        if(excludeLastComponent) {
-          var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]);
-          var result = vec3(u[0]/len, u[1]/len, u[2]);
-          return result;
-          break;
-        }
-        else {
-        var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2]);
-        var result = vec3(u[0]/len, u[1]/len, u[2]/len);
-        return result;
-        break;
-      }
+         if(excludeLastComponent) {
+            var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]);
+            result = vec3(u[0]/len, u[1]/len, u[2]);
+         }
+         else {
+            var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2]);
+            result = vec3(u[0]/len, u[1]/len, u[2]/len);
+         }
+         break;
       case 'vec4':
-      if(excludeLastComponent) {
-        var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2]);
-        var result = vec4(u[0]/len, u[1]/len, u[2]/len, u[3]);
-        return result;
-        break;
-      }
-      else {
-        var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2]+u[3]*u[3]);
-        var result = vec4(u[0]/len, u[1]/len, u[2]/len, u[3]/len);
-        return result;
-        break;
-      }
-    }
+         if(excludeLastComponent) {
+            var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2]);
+            result = vec4(u[0]/len, u[1]/len, u[2]/len, u[3]);
+         }
+         else {
+            var len = Math.sqrt(u[0]*u[0]+u[1]*u[1]+u[2]*u[2]+u[3]*u[3]);
+            result = vec4(u[0]/len, u[1]/len, u[2]/len, u[3]/len);
+         }
+         break;
+      default:  
+         throw "normalize: not a vector type";
+
+   }
+   return result;
 }
 
 //----------------------------------------------------------------------------

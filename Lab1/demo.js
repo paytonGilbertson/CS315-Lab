@@ -23,8 +23,16 @@ var objectColor = colors['red']; //current color of sphere
 var rotAngle = 0; //current rotation angle of scene
 var rotChange = -0.5; //speed and direction of scene rotation
 
-var uColor1 = vec3(0.9, 0.9, 0.9);
-var uColor2 = vec3(0.05, 0.05, 0.05);
+var uColor1 = vec3(1, 1, 1);
+var uColor2 = vec3(1, 1, 1);
+
+var uRed1 = 0.9;
+var uGreen1 = 0.9;
+var uBlue1 = 0.9;
+
+var uRed2 = 0.5;
+var uGreen2 = 0.5;
+var uBlue2 = 0.5;
 
 window.addEventListener("load", init);
 
@@ -78,10 +86,26 @@ function setupEventListeners(){
    m.addEventListener("input", function(event){
       var userC1 = m.uColor1.value;
       uColor1 = userC1;
-      console.log(userC1);
+      var p = document.createElement("p");
+      p.style.color = uColor1;
+      //console.log(userC1);
 
       var userC2 = m.uColor2.value;
       uColor2 = userC2;
+      var q = document.createElement("q");
+      q.style.color = uColor2;
+
+      var uRGB1 = p.style.color.match(/^.*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/);
+      console.log(uRGB1[0]);
+      uRed1 = uRGB1[1]/255.0;
+      uGreen1 = uRGB1[2]/255.0;
+      uBlue1 = uRGB1[3]/255.0;
+
+      var uRGB2 = q.style.color.match(/^.*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/);
+      console.log(uRGB2[0]);
+      uRed2 = uRGB2[1]/255.0;
+      uGreen2 = uRGB2[2]/255.0;
+      uBlue2 = uRGB2[3]/255.0;
    })
 
 }
@@ -98,7 +122,7 @@ gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 // Draw previous mo;del state
 // Notice we modularized the work a bit...
 PreRenderScene();
-RenderStockScene(uColor1, uColor2);
+RenderStockScene(uRed1, uGreen1, uBlue1, uRed2, uGreen2, uBlue2);
 RenderScene();
 
 // Update the model and request a new animation frame
@@ -126,7 +150,7 @@ function PreRenderScene() {
  // Purpose:
  //     Draw a stock scene that looks like a
  //     black and white checkerboard
- function RenderStockScene(color1, color2) {
+ function RenderStockScene(r1, g1, b1, r2, g2, b2) {
     var delta = 0.5;
  
     // define four vertices that make up a square.
@@ -139,8 +163,8 @@ function PreRenderScene() {
     var color = 0;
  
     // define the two colors
-    //var color1 =  vec4(0.05, 0.05, 1.0, 1)
-    //var color2 = vec4(0.05, 0.05, 0.05, 1);
+    var color1 =  vec4(r1, g1, b1, 1.0)
+    var color2 = vec4(r2, g2, b2, 1.0);
  
     //Make a checkerboard
     var placementX = mv;
