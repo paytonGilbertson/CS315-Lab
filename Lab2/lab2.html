@@ -28,6 +28,26 @@
         }
    </script>
 
+   <script id="flat-vertex-shader" type="x-shader/x-vertex">
+    #version 300 es
+
+    in  vec3 vPosition; //receives incoming vertex positions
+    uniform vec4 uColor;
+
+    out vec4 color;    //passes the colour of this vertex to the fragment shader
+    
+    void main() 
+    {
+      //Add z and w coordinates to the incoming position and pass it on.
+      gl_Position = vec4(vPosition*vec3(2.0/485.0,-2.0/480.0,0.0), 1.0);
+      gl_Position.xy = gl_Position.xy - vec2(1,-1);
+      gl_PointSize = 10.0;
+      
+      //Colour every vertex red
+      color = uColor; //colour channels are red, green, blue and alpha
+    } 
+  </script>
+
     <!-- This in-line script is a vertex shader resource
       Shaders can be linked from an external file as well.
       First line must be shader language version, no spaces before.

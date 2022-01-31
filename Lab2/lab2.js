@@ -1,16 +1,73 @@
 // This variable will store the WebGL rendering context
 var gl;
-var myFirstVao;
+
+//Uniform Color Index
 var uColor;
+
+//Vertex Array Objects (VAOs)
+var flatArrays, smoothArrays;
+
+// Shader Programs
+var smoothProgram, flatProgram;
+
+var bgStripes = [
+    vec2(-0.95, 1.0),
+    vec2(-0.95, -1.0),
+    vec2(-0.85, 1.0),
+    vec2(-0.85, -1.0),
+
+    vec2(-0.75, 1.0),
+    vec2(-0.75, -1.0),
+    vec2(-0.65, 1.0),
+    vec2(-0.65, -1.0),
+
+    vec2(-0.55, 1.0),
+    vec2(-0.55, -1.0),
+    vec2(-0.45, 1.0),
+    vec2(-0.45, -1.0),
+
+    vec2(-0.35, 1.0),
+    vec2(-0.35, -1.0),
+    vec2(-0.25, 1.0),
+    vec2(-0.25, -1.0),
+
+    vec2(-0.15, 1.0),
+    vec2(-0.15, -1.0),
+    vec2(-0.05, 1.0),
+    vec2(-0.05, -1.0),
+
+    vec2(0.05, 1.0),
+    vec2(0.05, -1.0),
+    vec2(0.15, 1.0),
+    vec2(0.15, -1.0),
+
+    vec2(0.25, 1.0),
+    vec2(0.25, -1.0),
+    vec2(0.35, 1.0),
+    vec2(0.35, -1.0),
+
+    vec2(0.45, 1.0),
+    vec2(0.45, -1.0),
+    vec2(0.55, 1.0),
+    vec2(0.55, -1.0),
+
+    vec2(0.65, 1.0),
+    vec2(0.65, -1.0),
+    vec2(0.75, 1.0),
+    vec2(0.75, -1.0),
+
+    vec2(0.85, 1.0),
+    vec2(0.85, -1.0),
+    vec2(0.95, 1.0),
+    vec2(0.95, -1.0)
+];
 
 var leftLens = circleLeft(25);
 var rightLens = circleRight(50);
 
 
 var bgTeal = vec4(0.4941176471, 0.6117647059, 0.6, 1.0);
-var bgWhite = vec4(0.7647058824, 0.7137254902, 0.6862745098, 1);
 
-var glassesFrame = vec4( 1, 0.7, 0.75, 1);
 
 window.addEventListener("load", init);
 function init() {
@@ -25,97 +82,76 @@ function init() {
         alert("Cannot get WebGL2 Rendering Context");
     }
 
-    var program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
+    //configure WebGL
+    gl.clearColor(0.4941176471, 0.6117647059, 0.6, 1.0);
 
-    var points =
-        [
-            vec2(-0.95, 1.0),
-            vec2(-0.95, -1.0),
-            vec2(-0.85, 1.0),
-            vec2(-0.85, -1.0),
+    // Load and inistialize shaders
+    var smoothProgram = initShaders(gl, "vertex-shader", "fragment-shader");
+    var flatProgram = initShaders(gl, "flat-vertex-shader", "fragment-shader");
+    //gl.useProgram(program);
 
-            vec2(-0.75, 1.0),
-            vec2(-0.75, -1.0),
-            vec2(-0.65, 1.0),
-            vec2(-0.65, -1.0),
+    smoothArrays = gl.createVertexArray();
+    gl.bindVertexArray(smoothArrays);
 
-            vec2(-0.55, 1.0),
-            vec2(-0.55, -1.0),
-            vec2(-0.45, 1.0),
-            vec2(-0.45, -1.0),
 
-            vec2(-0.35, 1.0),
-            vec2(-0.35, -1.0),
-            vec2(-0.25, 1.0),
-            vec2(-0.25, -1.0),
 
-            vec2(-0.15, 1.0),
-            vec2(-0.15, -1.0),
-            vec2(-0.05, 1.0),
-            vec2(-0.05, -1.0),
+    // Load data into GPU data buffers
 
-            vec2(0.05, 1.0),
-            vec2(0.05, -1.0),
-            vec2(0.15, 1.0),
-            vec2(0.15, -1.0),
+    /* Position Buffer */
+    var smoothPositions = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, smoothPositions);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(smoothPositions), gl.STATIC_DRAW);
 
-            vec2(0.25, 1.0),
-            vec2(0.25, -1.0),
-            vec2(0.35, 1.0),
-            vec2(0.35, -1.0),
+    // Associate shader atributes with corresponding data buffers
+        var smoothvPosition = gl.getAttribLocation(smoothProgram, "vPosition");
+        gl.enableVertexAttribArray(smoothvPosition);
+        gl.vertexAttribPointer(smoothvPosition, 2, gl.FLOAT, gl.FALSE, 0, 0);
 
-            vec2(0.45, 1.0),
-            vec2(0.45, -1.0),
-            vec2(0.55, 1.0),
-            vec2(0.55, -1.0),
 
-            vec2(0.65, 1.0),
-            vec2(0.65, -1.0),
-            vec2(0.75, 1.0),
-            vec2(0.75, -1.0),
 
-            vec2(0.85, 1.0),
-            vec2(0.85, -1.0),
-            vec2(0.95, 1.0),
-            vec2(0.95, -1.0)
-        ];
-
-        var colors =
-        [
-            bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, bgWhite, 
-        ];
-
-    leftLens.start = points.length;
-    points = points.concat(leftLens);
-    rightLens.start = points.length;
-    points = points.concat(rightLens);
-
-    var positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
-
+    /* Color Buffer */
     var colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+    //gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
-    myFirstVao = gl.createVertexArray();
-    gl.bindVertexArray(myFirstVao);
-
-    uColor = gl.getUniformLocation(program, "uColor");
-
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.enableVertexAttribArray(vPosition);
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, gl.FALSE, 0, 0);
-
-    //Enable the shader's vertex colour input and attach the active buffer
-    var vColor = gl.getAttribLocation(program, "vColor");
+    // Enable the shader's vertex color input and attach the active buffer
+    var vColor = gl.getAttribLocation(smoothProgram, "vColor");
     gl.enableVertexAttribArray(vColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, gl.FALSE, 0, 0);
 
-    gl.clearColor(0.4941176471, 0.6117647059, 0.6, 1.0);
+    // Allocate a VAO to manage buffer connections to the shader
+    flatArrays = gl.createVertexArray();
+    gl.bindVertexArray(flatArrays);
+
+    // Points to draw with UNIFORM COLORS
+    var flatPoints = [];
+
+    /*
+        INSERT CONCATS FOR STRIPES AND BASIC GLASSES FRAME HERE
+    */
+    flatPoints = flatPoints.concat(bgStripes);
+
+    
+    leftLens.start = flatPoints.length;
+    flatPoints = flatPoints.concat(leftLens);
+    rightLens.start = flatPoints.length;
+    flatPoints = flatPoints.concat(rightLens);
+
+
+    // Create a buffer for vertex positions, make it active, and copy the data to it
+    var flatPositions = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, flatPositions);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(flatPoints), gl.STATIC_DRAW);
+
+    // Associate shader attributes with corresponding data buffers
+    var flatvPosition = gl.getAttribLocation(flatProgram, "vPosition");
+    gl.enableVertexAttribArray(flatvPosition);
+    gl.vertexAttribPointer(flatvPosition, 2, gl.FLOAT, gl.FALSE, 0, 0);
+
+    // Get addresses of shader uniforms
+    uColor = gl.getUniformLocation(flatProgram, "uColor");
+    ////// End of flat shader
+
 
     requestAnimationFrame(render);
 
@@ -123,27 +159,35 @@ function init() {
 
 
 function render() {
-    console.log();
-    //var bgWhite = vec4(0.7647058824, 0.7137254902, 0.6862745098, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
     // Background Stripes
-    gl.uniform4f(uColor, 0.7647058824, 0.7137254902, 0.6862745098, 1);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);    
-    gl.drawArrays(gl.TRIANGLE_STRIP, 8, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 12, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 16, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 20, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 24, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 28, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 32, 4);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 36, 4);
 
-    gl.uniform4fv(uColor, flatten(glassesFrame));
+    // draw flat shading with color uniform
+    gl.useProgram(flatProgram);
+    gl.bindVertexArray(flatArrays);
+
+    // colors
+    var bgWhite = vec4(0.7647058824, 0.7137254902, 0.6862745098, 1);
+    var glassesFrame = vec4( 1, 0.7, 0.75, 1);
+
+    gl.uniform4fv(uColor, bgWhite);
+    for(var startNum = bgStripes.start; startNum > bgStripes.length; startNum += 4)
+    {
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 4, 4);    
+        gl.drawArrays(gl.TRIANGLE_STRIP, 8, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 12, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 16, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 20, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 24, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 28, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 32, 4);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 36, 4);
+    }
+    gl.uniform4fv(uColor, glassesFrame);
     gl.drawArrays(gl.TRIANGLE_STRIP, leftLens.start, leftLens.length);
     gl.drawArrays(gl.TRIANGLE_STRIP, rightLens.start, rightLens.length);
 
-console.log(glassesFrame);
 
 };
 
