@@ -14,6 +14,8 @@ var bgWhite = vec4(0.7647058824, 0.7137254902, 0.6862745098, 1);
 
 var glassesFrame = vec4(0.98, 0.5, 0.55, 0.9);
 
+var wordCLR = vec4(0.6, 0, 0.4, 1);
+
 var points =
     [
 
@@ -107,7 +109,7 @@ var wings = [
     vec2(0.87, -0.2),
 
     vec2(0.65, -0.35),
-    vec2(0.745, -0.33), 
+    vec2(0.745, -0.33),
 
 
     vec2(-0.85, 0.0),
@@ -124,7 +126,7 @@ var wings = [
     vec2(-0.87, -0.2),
 
     vec2(-0.65, -0.35),
-    vec2(-0.745, -0.33), 
+    vec2(-0.745, -0.33),
 
 ];
 
@@ -134,7 +136,7 @@ var lensStripes = [
 
     vec2(-0.65, 0.12),
     vec2(-0.29, 0.01),
-    
+
     vec2(-0.52, 0.2),
     vec2(-0.28, 0.02),
 
@@ -162,7 +164,7 @@ var lensStripes = [
 
     vec2(0.25, 0.12),
     vec2(0.61, 0.01),
-    
+
     vec2(0.38, 0.24),
     vec2(0.62, 0.02),
 
@@ -183,6 +185,198 @@ var lensStripes = [
 
     vec2(0.62, -0.21),
     vec2(0.64, -0.04)
+];
+
+var words = [
+    //S
+    vec2(-0.8, 0.8),
+    vec2(-0.875, 0.9),
+
+    vec2(-0.875, 0.9),
+    vec2(-0.95, 0.8),
+
+    vec2(-0.95, 0.8),
+    vec2(-0.8, 0.7),
+
+    vec2(-0.8, 0.7),
+    vec2(-0.875, 0.6),
+
+    vec2(-0.875, 0.6),
+    vec2(-0.95, 0.7),
+
+    //P
+    vec2(-0.75, 0.6),
+    vec2(-0.75, 0.9),
+
+    vec2(-0.75, 0.9),
+    vec2(-0.65, 0.9),
+
+    vec2(-0.64, 0.89),
+    vec2(-0.64, 0.8),
+
+    vec2(-0.75, 0.79),
+    vec2(-0.65, 0.79),
+
+    //E
+    vec2(-0.6, 0.9),
+    vec2(-0.6, 0.6),
+
+    vec2(-0.6, 0.9),
+    vec2(-0.5, 0.9),
+
+    vec2(-0.6, 0.75),
+    vec2(-0.525, 0.75),
+
+    vec2(-0.6, 0.6),
+    vec2(-0.5, 0.6),
+
+    //C
+    vec2(-0.375, 0.9),
+    vec2(-0.45, 0.9),
+
+    vec2(-0.45, 0.9),
+    vec2(-0.45, 0.6),
+
+    vec2(-0.375, 0.6),
+    vec2(-0.45, 0.6),
+
+    //T
+    vec2(-0.25, 0.9),
+    vec2(-0.35, 0.9),
+
+    vec2(-0.3, 0.9),
+    vec2(-0.3, 0.6),
+
+    //R
+    vec2(-0.2, 0.6),
+    vec2(-0.2, 0.9),
+
+    vec2(-0.2, 0.9),
+    vec2(-0.1, 0.9),
+
+    vec2(-0.1, 0.89),
+    vec2(-0.1, 0.8),
+
+    vec2(-0.2, 0.79),
+    vec2(-0.1, 0.79),
+
+    vec2(-0.2, 0.81),
+    vec2(-0.1, 0.605),
+
+    //E
+    vec2(-0.05, 0.9),
+    vec2(-0.05, 0.6),
+
+    vec2(-0.05, 0.9),
+    vec2(0.05, 0.9),
+
+    vec2(-0.05, 0.75),
+    vec2(0.025, 0.75),
+
+    vec2(-0.05, 0.6),
+    vec2(0.05, 0.6),
+
+    //S
+    vec2(0.25, 0.8),
+    vec2(0.175, 0.9),
+
+    vec2(0.175, 0.9),
+    vec2(0.1, 0.8),
+
+    vec2(0.1, 0.8),
+    vec2(0.225, 0.7),
+
+    vec2(0.225, 0.7),
+    vec2(0.175, 0.6),
+
+    vec2(0.175, 0.6),
+    vec2(0.1, 0.7),
+
+    //P
+    vec2(0.3, 0.6),
+    vec2(0.3, 0.9),
+
+    vec2(0.3, 0.9),
+    vec2(0.4, 0.9),
+
+    vec2(0.4, 0.89),
+    vec2(0.4, 0.8),
+
+    vec2(0.3, 0.79),
+    vec2(0.4, 0.79),
+
+    //E
+    vec2(0.45, 0.9),
+    vec2(0.45, 0.6),
+
+    vec2(0.45, 0.9),
+    vec2(0.55, 0.9),
+
+    vec2(0.45, 0.75),
+    vec2(0.525, 0.75),
+
+    vec2(0.45, 0.6),
+    vec2(0.55, 0.6),
+
+    //C
+    vec2(0.6, 0.9),
+    vec2(0.7, 0.9),
+
+    vec2(0.6, 0.9),
+    vec2(0.6, 0.6),
+
+    vec2(0.6, 0.6),
+    vec2(0.7, 0.6),
+
+    //S
+    vec2(0.875, 0.8),
+    vec2(0.8, 0.9),
+
+    vec2(0.8, 0.9),
+    vec2(0.725, 0.8),
+
+    vec2(0.725, 0.8),
+    vec2(0.875, 0.7),
+
+    vec2(0.875, 0.7),
+    vec2(0.8, 0.6),
+
+    vec2(0.8, 0.6),
+    vec2(0.725, 0.7),
+];
+
+var dots = [
+    vec2(0.1, 0.0),
+    vec2(-0.2, 0.25),
+    vec2(0.5, 0.37),
+    vec2(-0.75, -0.2),
+    vec2(-0.6, 0.3),
+    vec2(0.6, -0.3),
+    vec2(-0.2, -0.2),
+    vec2(0.4, 0.32),
+    vec2(-0.3, 0.3),
+    vec2(-0.6, -0.3),
+    vec2(-0.78, 0.05),
+    vec2(0.81, 0.1829),
+    vec2(0.13099, 0.09543),
+    vec2(0.8199, 0.234),
+    vec2(0.25566, 0.339),
+    vec2(0.41226, 0.31701),
+    vec2(0.26, -0.30),
+    vec2(0.3, -0.3),
+    vec2(0.53, -0.32),
+    vec2(0.11, -0.17),
+    vec2(0.15, 0.19),
+    vec2(-0.1, -0.04),
+    vec2(-0.75, 0.15),
+    vec2(-0.68, 0.30),
+    vec2(-0.72, -0.32),
+    vec2(-0.5, -0.37),
+    vec2(-0.45, 0.35),
+    vec2(-0.53, 0.37),
+    vec2(-0.14, 0.08),
+    vec2(-0.31, -0.35),
+    vec2(-0.79, -0.05),
 ];
 
 window.addEventListener("load", init);
@@ -219,6 +413,10 @@ function init() {
     points = points.concat(rightFill);
     lensStripes.start = points.length;
     points = points.concat(lensStripes);
+    words.start = points.length;
+    points = points.concat(words);
+    dots.start = points.length;
+    points = points.concat(dots);
 
     for (var i = 0; i < bgStripeCoords.length; i++) {
         colors = colors.concat(bgWhite);
@@ -230,34 +428,38 @@ function init() {
     for (var i = 0; i < rightLens.length; i++) {
         colors = colors.concat(glassesFrame);
     }
-    for(var i = 0; i < noseBar.length; i++){
+    for (var i = 0; i < noseBar.length; i++) {
         colors = colors.concat(glassesFrame);
     }
-    for(var i = 0; i < wings.length; i++){
+    for (var i = 0; i < wings.length; i++) {
         colors = colors.concat(glassesFrame);
     }
     colors = colors.concat(vec4(0, 0, 1, 1));
     colors = colors.concat(vec4(0, 0, 1, 1));
 
-    for(var i = 0; i < leftFill.length-2; i++){
-        colors = colors.concat(vec4(1,1,1,1));
+    for (var i = 0; i < leftFill.length - 2; i++) {
+        colors = colors.concat(vec4(1, 1, 1, 1));
     }
     colors = colors.concat(vec4(0.7, 0, 1, 1));
     colors = colors.concat(vec4(0.7, 0, 1, 1));
 
-    for(var i = 0; i < rightFill.length-2; i++){
-        colors = colors.concat(vec4(1,1,1,1));
+    for (var i = 0; i < rightFill.length - 2; i++) {
+        colors = colors.concat(vec4(1, 1, 1, 1));
     }
-    for(var i = 0; i < lensStripes.length; i++){
-        console.log(i%2);
-        if(i%2 == 0)
-        {
-            colors = colors.concat(vec4(0,0,0,1));
+    for (var i = 0; i < lensStripes.length; i++) {
+        console.log(i % 2);
+        if (i % 2 == 0) {
+            colors = colors.concat(vec4(0, 0, 0, 1));
         }
-        else
-        {
-            colors = colors.concat(vec4(1,1,1,1));
+        else {
+            colors = colors.concat(vec4(1, 1, 1, 1));
         }
+    }
+    for (var i = 0; i < words.length; i++) {
+        colors = colors.concat(wordCLR);
+    }
+    for (var i = 0; i < dots.length; i++) {
+        colors = colors.concat(vec4(Math.random(), 0, Math.random(), 0.75))
     }
 
     var positionBuffer = gl.createBuffer();
@@ -272,6 +474,7 @@ function init() {
     gl.bindVertexArray(myFirstVao);
 
     uColor = gl.getUniformLocation(program, "uColor");
+    uPSize = gl.getUniformLocation(program, "uPSize");
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.enableVertexAttribArray(vPosition);
@@ -305,9 +508,15 @@ function render() {
     gl.drawArrays(gl.TRIANGLE_STRIP, leftLens.start, leftLens.length);
     gl.drawArrays(gl.TRIANGLE_STRIP, rightLens.start, rightLens.length);
     gl.drawArrays(gl.TRIANGLE_STRIP, noseBar.start, noseBar.length);
+    gl.uniform1f(uPSize, 25.0);
     gl.drawArrays(gl.POINTS, wings.start, wings.length);
+    gl.lineWidth(2.5);
     gl.drawArrays(gl.LINES, lensStripes.start, lensStripes.length);
-    
+    gl.lineWidth(7.5);
+    gl.drawArrays(gl.LINES, words.start, words.length);
+    gl.uniform1f(uPSize, 5);
+    gl.drawArrays(gl.POINTS, dots.start, dots.length);
+
 
 };
 
