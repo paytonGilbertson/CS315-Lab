@@ -187,7 +187,9 @@ window.onload = function init() {
   //gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
   //Set up projection matrix
-  p = perspective(45.0, 1.0, 0.1, 100.0);
+  var aspect = gl.drawingBufferWidth/ gl.drawingBufferHeight;
+  //p = perspective(45.0, aspect, 0.1, 100.0);
+  p = ortho(-2, 2, -2, 2, 0.1, 100.0);
   gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(transpose(p)));
  
   requestAnimationFrame(render);
@@ -199,6 +201,7 @@ window.onload = function init() {
 // Rendering Event Function
 //----------------------------------------------------------------------------
 
+var a = 0;
 function render() {
 
 	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -209,9 +212,62 @@ function render() {
 	var up =  vec3(0.0, 1.0, 0.0);
 
 	mv = lookAt(eye,at,up);
+
 	
-	
-	gl.uniformMatrix4fv(mvLoc, gl.TRUE, flatten(transpose(mv)));
+	gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
 	gl.drawArrays(shapes.axes.type, shapes.axes.start, shapes.axes.size);	
 
+   var bookmark = [];
+   bookmark.push(mv);
+
+   //Cube 1
+   mv = mult(mv, translate(1, 0, 0));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+   gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+   
+   //mv = bookmark.pop();
+
+   mv = mult(mv, translate(0, 0, 0));
+   mv = mult(mv, rotateZ(a));
+
+   bookmark.push(mv);
+   //Cube 2
+   mv = mult(mv, translate(1, 0.25, 0));
+   mv = mult(mv, scale(2, 0.5, 0.5));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+   gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+
+   mv = bookmark.pop();
+   bookmark.push(mv);
+
+    //Cube 3
+    mv = mult(mv, translate(-0.25, 1, 0));
+    mv = mult(mv, scale(0.5, 2, 0.5));
+    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+    gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+
+    mv = bookmark.pop();
+    bookmark.push(mv);
+
+    //Cube 4
+   mv = mult(mv, translate(-1, -0.25, 0));
+   mv = mult(mv, scale(2, 0.5, 0.5));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+   gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+
+   mv = bookmark.pop();
+   bookmark.push(mv);
+
+    //Cube 5
+    mv = mult(mv, translate(0.25, -1, 0));
+    mv = mult(mv, scale(0.5, 2, 0.5));
+    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+    gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+    
+    mv = bookmark.pop()
+
+    mv = bookmark.pop();
+
+    a+=1;
+    requestAnimationFrame(render);
 }
