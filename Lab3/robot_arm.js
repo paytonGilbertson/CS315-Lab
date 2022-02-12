@@ -234,6 +234,7 @@ window.onload = function init() {
    var aspect = canvas.clientWidth/canvas.clientHeight;
    //p = ortho(-3.4*aspect, 3.4*aspect, -3.4, 3.4, 1.0, 20.0);
    p = perspective(40.0, aspect, 0.1, 100.0);
+   
 
    gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(transpose(p)));
 
@@ -243,6 +244,7 @@ window.onload = function init() {
    var up = vec3(0.0, 1.0, 0.0);
 
    mv = lookAt(eye, at, up);
+   mv = mult(mv, rotateX(90));
 
    //Animate - draw continuously
    requestAnimationFrame(animate);
@@ -315,8 +317,22 @@ function render() {
 		//Undo Scale
 		mv = matStack.pop();
 
-    //Restore mv to initial state
-	mv = matStack.pop();
+      //Position Top Finger 1
+      mv = mult(mv, translate(1.0, 1.0, 0.0));
+      //Elbow Joint
+      mv = mult(mv, rotate(elbow,vec3(0,0,1)));
+      //Position Forearm Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw Forearm
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.1, 1.0));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      //Restore mv to initial state
+      mv = matStack.pop();
 	
 }
 

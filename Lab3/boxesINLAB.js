@@ -43,7 +43,6 @@ var lightred =		vec4(1.0, 0.5, 0.5, 1.0);
 var lightgreen =	vec4(0.5, 1.0, 0.5, 1.0);
 var lightblue =   	vec4(0.5, 0.5, 1.0, 1.0);
 var white = 	   	vec4(1.0, 1.0, 1.0, 1.0);
-var yellow =      vec4(1.0, 1.0, 0.0, 1.0);
 
 
 //Generate Axis Data: use LINES to draw. Three axes in red, green and blue
@@ -61,7 +60,7 @@ shapes.axes.colors =
 [
 	green,green,
 	red,  red,
-	blue, blue,
+	blue, blue
 ];
 
 
@@ -99,7 +98,7 @@ var solidCubeLookups = [
 ];
 
 //Expand Wire Cube data: this wire cube will be white...
-for (var i = 0; i < wireCubeLookups.length; i++)
+for (var i =0; i < wireCubeLookups.length; i++)
 {
    shapes.wireCube.points.push(cubeVerts[wireCubeLookups[i]]);
    shapes.wireCube.colors.push(white);
@@ -188,12 +187,9 @@ window.onload = function init() {
   //gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
   //Set up projection matrix
-
-  //Question 4
-  var aspect = canvas.clientWidth/canvas.clientHeight; 
+  var aspect = gl.drawingBufferWidth/ gl.drawingBufferHeight;
   //p = perspective(45.0, aspect, 0.1, 100.0);
-  p = ortho(-2.5, 2.5, -2.5, 2.5, 0.1, 100.0);
-
+  p = ortho(-2, 2, -2, 2, 0.1, 100.0);
   gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(transpose(p)));
  
   requestAnimationFrame(render);
@@ -205,6 +201,7 @@ window.onload = function init() {
 // Rendering Event Function
 //----------------------------------------------------------------------------
 
+var a = 0;
 function render() {
 
 	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -214,45 +211,63 @@ function render() {
 	var at =  vec3(0.0, 0.0, 0.0);
 	var up =  vec3(0.0, 1.0, 0.0);
 
-   // Question 1
-
 	mv = lookAt(eye,at,up);
-	//mv = mult(mv, translate(0, 0, -10));
 
-   // Question 10 part 1
-   //mv = mult(mv, rotateX(90))
-
-   // Question 11
-   mv = mult(mv, rotateX(-30))
-   mv = mult(mv, rotateY(-30))
-   
 	
-	gl.uniformMatrix4fv(mvLoc, gl.TRUE, flatten(transpose(mv)));
-	gl.drawArrays(shapes.axes.type, shapes.axes.start, shapes.axes.size);
-   
-   // Question 10 part 2
-   //mv = mult(mv, rotateX(90));
+	gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+	gl.drawArrays(shapes.axes.type, shapes.axes.start, shapes.axes.size);	
+
    var bookmark = [];
    bookmark.push(mv);
 
-   // Question 5 & 6
-   // Cube 1 (1, 0, 0)
+   //Cube 1
    mv = mult(mv, translate(1, 0, 0));
    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
    gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+   
    mv = bookmark.pop();
 
    mv = mult(mv, translate(0, 0, 0));
+   mv = mult(mv, rotateZ(a));
 
    bookmark.push(mv);
-
-   // Question 7 & 8
-   // Cube 2
-   mv = mult(mv, translate(1, 1, 0));
-   mv = mult(mv, rotateY(-45));
+   //Cube 2
+   mv = mult(mv, translate(1, 0.25, 0));
+   mv = mult(mv, scale(2, 0.5, 0.5));
    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
    gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
 
-   requestAnimationFrame(render);
-   
+   mv = bookmark.pop();
+   bookmark.push(mv);
+
+    //Cube 3
+    mv = mult(mv, translate(-0.25, 1, 0));
+    mv = mult(mv, scale(0.5, 2, 0.5));
+    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+    gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+
+    mv = bookmark.pop();
+    bookmark.push(mv);
+
+    //Cube 4
+   mv = mult(mv, translate(-1, -0.25, 0));
+   mv = mult(mv, scale(2, 0.5, 0.5));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+   gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+
+   mv = bookmark.pop();
+   bookmark.push(mv);
+
+    //Cube 5
+    mv = mult(mv, translate(0.25, -1, 0));
+    mv = mult(mv, scale(0.5, 2, 0.5));
+    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+    gl.drawArrays(shapes.wireCube.type, shapes.wireCube.start, shapes.wireCube.size);
+    
+    mv = bookmark.pop()
+
+    mv = bookmark.pop();
+
+    a+=1;
+    requestAnimationFrame(render);
 }

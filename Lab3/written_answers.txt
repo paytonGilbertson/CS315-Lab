@@ -1,0 +1,19 @@
+1. No change in display. Translate() only modifies the z-axis by -10 and 
+    leaves the other two axes the same. Since the crosshare is at
+    (0, 0, 0), the camera must be further in the z-axis for it to be 
+    visible.
+
+2. Everything that was on the canvas disapears. The camera is at 
+    (0, 0, 0) so it is inside the contents of the canvas making them 
+    not within the view of the camera.
+
+4. 
+    a. Height of the canvas is cut in half and the 3D drawing is also 
+        half of its regular size.
+
+    b. Width is cut in half and the 3D drawing is to wide to fit on 
+        the canvas.
+
+10. You would have to counteract the rotation before creating the bookmark array. 
+    Rotate mv at the beginning by 90 degrees on the X axis to see top down.
+    To leave your x and y axes as is, you would have to rotate by 90 degrees on the X-axis right before creating the bookmark array.
