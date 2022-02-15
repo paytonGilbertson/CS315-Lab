@@ -75,6 +75,8 @@ var mvLoc, projLoc;
 
 //Model state variables
 var shoulder = 0, elbow = 0;
+var finger = 0;
+var thumb = 0;
 
 
 //----------------------------------------------------------------------------
@@ -244,7 +246,7 @@ window.onload = function init() {
    var up = vec3(0.0, 1.0, 0.0);
 
    mv = lookAt(eye, at, up);
-   mv = mult(mv, rotateX(90));
+   //mv = mult(mv, rotateX(-90));
 
    //Animate - draw continuously
    requestAnimationFrame(animate);
@@ -282,7 +284,7 @@ function animate()
 function render() {
 	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 	
-   var armShape = shapes.wireCube;
+   var armShape = shapes.solidCube;
 	var matStack = [];
 	
 	//Save view transform
@@ -317,15 +319,119 @@ function render() {
 		//Undo Scale
 		mv = matStack.pop();
 
-      //Position Top Finger 1
-      mv = mult(mv, translate(1.0, 1.0, 0.0));
-      //Elbow Joint
-      mv = mult(mv, rotate(elbow,vec3(0,0,1)));
-      //Position Forearm Cube
+      finger = -30;
+      //Position Finger 1 Joint 1
+      mv = mult(mv, translate(0.8, -1.0, 0.4));
+      //Finger Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position finger Cube
       mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw Forearm
+      //Scale and Draw finger 1
       matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.1, 1.0));
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      finger = 0;
+      //Position Finger 2 Joint 1
+      mv = mult(mv, translate(-1.0, -1.0, -0.4));
+      //finger Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position finger Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw finger 2
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      //Position Finger 3 Joint 1
+      mv = mult(mv, translate(-1.0, -1.0, -0.4));
+      //Finger Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position finger Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw finger 3
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      finger = 30;
+      //Position Finger 1 Joint 2
+      mv = mult(mv, translate(-0.8, -0.5, 0.8));
+      //Finger Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position finger Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw finger 1
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      finger = 0;
+      //Position Finger 2 Joint 2
+      mv = mult(mv, translate(-1.0, -1.0, -0.4));
+      //finger Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position finger Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw finger 2
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      //Position Finger 3 Joint 2
+      mv = mult(mv, translate(-1.0, -1.0, -0.4));
+      //Finger Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position finger Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw finger 3
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      finger = 30;
+      //Position thumb joint 1
+      mv = mult(mv, translate(-2, -1.2, 0.8));
+      //Thumb Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position thumn Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw thumb 
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
+         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+         gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+
+      finger = -30;
+      //Position thumb Joint 2
+      mv = mult(mv, translate(0.15, -1.25, 0.0));
+      //Thumb Joint
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+      //Position thumb Cube
+      mv = mult(mv, translate(1, 1.0, 0.0));
+      //Scale and Draw thumb 
+      matStack.push(mv);
+         mv = mult(mv, scale(0.5, 0.2, 0.2));
          gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
          gl.drawArrays(armShape.type, armShape.start, armShape.size);
       //Undo Scale
@@ -333,6 +439,7 @@ function render() {
 
       //Restore mv to initial state
       mv = matStack.pop();
+      //console.log(finger);
 	
 }
 
@@ -357,6 +464,7 @@ document.onkeydown = function handleKeyDown(event) {
    var key = String.fromCharCode(c);
 
 	//Place key down detection code here
+   console.log(c);
 }
 
 document.onkeyup = function handleKeyUp(event) {
@@ -416,5 +524,25 @@ function handleKeys(timePassed)
    {
       if (elbow > -144) elbow = (elbow - d);
       else elbow = -144;
+   }
+
+   //Finger Updates
+   if(shift && isPressed("F"))
+   {
+      if (finger < -30) 
+      {
+         finger = (finger + d);
+         console.log(finger);
+      }
+         else finger = -30;
+   }
+   if(!shift && isPressed("F"))
+   {
+      if(finger > -60) 
+      {
+         finger = (finger - d);
+         console.log(finger);   
+      }
+      else finger = -60;
    }
 }
