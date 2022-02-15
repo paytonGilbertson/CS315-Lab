@@ -74,9 +74,7 @@ var p  = new mat4();
 var mvLoc, projLoc;
 
 //Model state variables
-var shoulder = 0, elbow = 0;
-var finger = 0;
-var thumb = 0;
+var shoulder = 0, elbow = 0, wrist = -30, finger = 30;
 
 
 //----------------------------------------------------------------------------
@@ -246,7 +244,7 @@ window.onload = function init() {
    var up = vec3(0.0, 1.0, 0.0);
 
    mv = lookAt(eye, at, up);
-   //mv = mult(mv, rotateX(-90));
+   //mv = mult(mv, rotateX(90));
 
    //Animate - draw continuously
    requestAnimationFrame(animate);
@@ -281,34 +279,47 @@ function animate()
     render();
 }
 
+function axis(mv){
+   var temp = mv;
+   temp = mult(temp, scale(.2,.2,.2));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(temp)));
+			gl.drawArrays(shapes.axes.type, shapes.axes.start, shapes.axes.size);
+
+}
+
 function render() {
 	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 	
    var armShape = shapes.solidCube;
 	var matStack = [];
-	
-	//Save view transform
-	matStack.push(mv);
-	
-		//Position Shoulder Joint
-		mv = mult(mv,translate(-2.0, 0.0, 0.0));
-		//Shoulder Joint
-		mv = mult(mv,rotate(shoulder, vec3(0,0,1)));
-		//Position Upper Arm Cube
-		mv = mult(mv,translate(1.0, 0.0, 0.0));
-		//Scale and Draw Upper Arm
-		matStack.push(mv);
-			mv = mult(mv,scale(2.0, 0.4, 1.0));
-			gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-			gl.drawArrays(armShape.type, armShape.start, armShape.size);
-		//Undo Scale
-		mv = matStack.pop();
 
 	
-		//Position Elbow Joint
-		mv = mult(mv, translate(1.0, 0.0, 0.0));
-		//Elbow Joint
-		mv = mult(mv, rotate(elbow,vec3(0,0,1)));
+	//Save view transform
+
+//----------------------------------------------
+   //ARM COMPLETE - Preserve Wrist Space
+	matStack.push(mv);
+	
+   //Position Shoulder Joint
+   mv = mult(mv,translate(-3, 0.0, 0.0));
+   //Shoulder Joint
+   mv = mult(mv,rotate(shoulder, vec3(0,0,1)));
+   //Position Upper Arm Cube
+   mv = mult(mv,translate(1.0, 0.0, 0.0));
+   //Scale and Draw Upper Arm
+   matStack.push(mv);
+   mv = mult(mv,scale(2.0, 0.4, 1.0));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+   gl.drawArrays(armShape.type, armShape.start, armShape.size);
+   //Undo Scale
+   mv = matStack.pop();
+   
+	
+   //Position Elbow Joint
+   mv = mult(mv, translate(1.0, 0.0, 0.0));
+   //Elbow Joint
+   mv = mult(mv, rotate(elbow,vec3(0,0,1)));
+   //axis(mv);
 		//Position Forearm Cube
 		mv = mult(mv, translate(1, 0.0, 0.0));
 		//Scale and Draw Forearm
@@ -319,127 +330,182 @@ function render() {
 		//Undo Scale
 		mv = matStack.pop();
 
-      finger = -30;
-      //Position Finger 1 Joint 1
-      mv = mult(mv, translate(0.8, -1.0, 0.4));
-      //Finger Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position finger Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw finger 1
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
+      //Restore mv to initial state
+      //mv = matStack.pop();
+     // axis(mv);
+//------------------------------------------------
 
-      finger = 0;
-      //Position Finger 2 Joint 1
-      mv = mult(mv, translate(-1.0, -1.0, -0.4));
-      //finger Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position finger Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw finger 2
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
+//------------------------------------------------
+      // FINGER 1
+      //ARM COMPLETE - Preserve Wrist Space
+	matStack.push(mv);
 
-      //Position Finger 3 Joint 1
-      mv = mult(mv, translate(-1.0, -1.0, -0.4));
-      //Finger Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position finger Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw finger 3
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
-
-      finger = 30;
-      //Position Finger 1 Joint 2
-      mv = mult(mv, translate(-0.8, -0.5, 0.8));
-      //Finger Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position finger Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw finger 1
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
-
-      finger = 0;
-      //Position Finger 2 Joint 2
-      mv = mult(mv, translate(-1.0, -1.0, -0.4));
-      //finger Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position finger Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw finger 2
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
-
-      //Position Finger 3 Joint 2
-      mv = mult(mv, translate(-1.0, -1.0, -0.4));
-      //Finger Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position finger Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw finger 3
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
-
-      finger = 30;
-      //Position thumb joint 1
-      mv = mult(mv, translate(-2, -1.2, 0.8));
-      //Thumb Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position thumn Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw thumb 
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
-
-      finger = -30;
-      //Position thumb Joint 2
-      mv = mult(mv, translate(0.15, -1.25, 0.0));
-      //Thumb Joint
-      mv = mult(mv, rotate(finger,vec3(0,0,1)));
-      //Position thumb Cube
-      mv = mult(mv, translate(1, 1.0, 0.0));
-      //Scale and Draw thumb 
-      matStack.push(mv);
-         mv = mult(mv, scale(0.5, 0.2, 0.2));
-         gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
-         gl.drawArrays(armShape.type, armShape.start, armShape.size);
-      //Undo Scale
-      mv = matStack.pop();
+   //Position FIRST finger joint
+	
+   //Position Shoulder Joint
+   mv = mult(mv,translate(1, 0.2, 0.0));
+   //axis(mv);
+   //Shoulder Joint
+   mv = mult(mv,rotate(wrist, vec3(0,0,1)));
+   //Position Upper Arm Cube
+   mv = mult(mv,translate(0.25, 0.0, 0.0));
+   //Scale and Draw Upper Arm
+   matStack.push(mv);
+   mv = mult(mv,scale(0.5, 0.2, 0.2));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+   gl.drawArrays(armShape.type, armShape.start, armShape.size);
+   //Undo Scale
+   mv = matStack.pop();
+   
+	
+   //Position Elbow Joint
+   mv = mult(mv, translate(0.25, 0.0, 0.0));
+   //Elbow Joint
+   //axis(mv);
+   mv = mult(mv, rotate(finger,vec3(0,0,1)));
+		//Position Forearm Cube
+		mv = mult(mv, translate(0.25, 0.0, 0.0));
+		//Scale and Draw Forearm
+		matStack.push(mv);
+			mv = mult(mv, scale(0.5, 0.2, 0.2));
+			gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+			gl.drawArrays(armShape.type, armShape.start, armShape.size);
+		//Undo Scale
+		mv = matStack.pop();
 
       //Restore mv to initial state
       mv = matStack.pop();
-      //console.log(finger);
+//----------------------------------------------
+
+//------------------------------------------------
+      // FINGER 2
+      //ARM COMPLETE - Preserve Wrist Space
+      matStack.push(mv);
+
+      //Position FIRST finger joint
+      
+      //Position Shoulder Joint
+      mv = mult(mv,translate(1, 0.2, 0.35));
+      //axis(mv);
+      //Shoulder Joint
+      mv = mult(mv,rotate(wrist, vec3(0,0,1)));
+      //Position Upper Arm Cube
+      mv = mult(mv,translate(0.25, 0.0, 0.0));
+      //Scale and Draw Upper Arm
+      matStack.push(mv);
+      mv = mult(mv,scale(0.5, 0.2, 0.2));
+      gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+      gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+      
+      
+      //Position Elbow Joint
+      mv = mult(mv, translate(0.25, 0.0, 0.0));
+      //Elbow Joint
+      //axis(mv);
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+         //Position Forearm Cube
+         mv = mult(mv, translate(0.25, 0.0, 0.0));
+         //Scale and Draw Forearm
+         matStack.push(mv);
+            mv = mult(mv, scale(0.5, 0.2, 0.2));
+            gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+            gl.drawArrays(armShape.type, armShape.start, armShape.size);
+         //Undo Scale
+         mv = matStack.pop();
+   
+         //Restore mv to initial state
+         mv = matStack.pop();
+   //----------------------------------------------
+
+   //------------------------------------------------
+      // FINGER 3
+      //ARM COMPLETE - Preserve Wrist Space
+      matStack.push(mv);
+
+      //Position FIRST finger joint
+      
+      //Position Shoulder Joint
+      mv = mult(mv,translate(1, 0.2, -0.35));
+      //axis(mv);
+      //Shoulder Joint
+      mv = mult(mv,rotate(wrist, vec3(0,0,1)));
+      //Position Upper Arm Cube
+      mv = mult(mv,translate(0.25, 0.0, 0.0));
+      //Scale and Draw Upper Arm
+      matStack.push(mv);
+      mv = mult(mv,scale(0.5, 0.2, 0.2));
+      gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+      gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+      
+      
+      //Position Elbow Joint
+      mv = mult(mv, translate(0.25, 0.0, 0.0));
+      //Elbow Joint
+      //axis(mv);
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+         //Position Forearm Cube
+         mv = mult(mv, translate(0.25, 0.0, 0.0));
+         //Scale and Draw Forearm
+         matStack.push(mv);
+            mv = mult(mv, scale(0.5, 0.2, 0.2));
+            gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+            gl.drawArrays(armShape.type, armShape.start, armShape.size);
+         //Undo Scale
+         mv = matStack.pop();
+   
+         //Restore mv to initial state
+         mv = matStack.pop();
+   //----------------------------------------------
+
+
+   //------------------------------------------------
+      // THUMB
+      //ARM COMPLETE - Preserve Wrist Space
+      matStack.push(mv);
+
+      //Position FIRST finger joint
+      
+      //Position Shoulder Joint
+      mv = mult(mv, rotateX(180));
+      mv = mult(mv,translate(1, 0.2, -0.35));
+      //axis(mv);
+      //Shoulder Joint
+      mv = mult(mv,rotate(wrist, vec3(0,0,1)));
+      //Position Upper Arm Cube
+      mv = mult(mv,translate(0.25, 0.0, 0.0));
+      //Scale and Draw Upper Arm
+      matStack.push(mv);
+      mv = mult(mv,scale(0.5, 0.2, 0.2));
+      gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+      gl.drawArrays(armShape.type, armShape.start, armShape.size);
+      //Undo Scale
+      mv = matStack.pop();
+      
+      
+      //Position Elbow Joint
+      mv = mult(mv, translate(0.25, 0.0, 0.0));
+      //Elbow Joint
+      //axis(mv);
+      mv = mult(mv, rotate(finger,vec3(0,0,1)));
+         //Position Forearm Cube
+         mv = mult(mv, translate(0.25, 0.0, 0.0));
+         //Scale and Draw Forearm
+         matStack.push(mv);
+            mv = mult(mv, scale(0.5, 0.2, 0.2));
+            gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(mv)));
+            gl.drawArrays(armShape.type, armShape.start, armShape.size);
+         //Undo Scale
+         mv = matStack.pop();
+   
+         //Restore mv to initial state
+         mv = matStack.pop();
+   //----------------------------------------------
+      mv = matStack.pop();
+
 	
 }
 
@@ -529,20 +595,37 @@ function handleKeys(timePassed)
    //Finger Updates
    if(shift && isPressed("F"))
    {
-      if (finger < -30) 
+      if (wrist < -20) 
       {
-         finger = (finger + d);
-         console.log(finger);
+         wrist = (wrist + d);
       }
-         else finger = -30;
+         else wrist = -20;
    }
    if(!shift && isPressed("F"))
    {
-      if(finger > -60) 
+      if(wrist > -70) 
+      {
+         wrist = (wrist - d);
+      }
+      else wrist = -70;
+   }
+
+   //Fingertip Updates
+   if(shift && isPressed("T"))
+   {
+      if (finger > 20) 
       {
          finger = (finger - d);
-         console.log(finger);   
+         console.log(finger);
       }
-      else finger = -60;
+         else finger = 20;
+   }
+   if(!shift && isPressed("T"))
+   {
+      if(finger < 70) 
+      {
+         finger = (finger + d);
+      }
+      else finger = 70;
    }
 }
