@@ -1,0 +1,301 @@
+/*
+ * LE1.js
+ * Demonstrate lighting.
+ *
+ * Adapted for WebGL by Alex Clarke, 2016.
+ * Adapted for WebGL2 by Alex Clarke, Feb 2020.
+*/
+
+
+//----------------------------------------------------------------------------
+// Variable Setup
+//----------------------------------------------------------------------------
+
+// This variable will store the WebGL rendering context
+var gl;
+var canvas;
+var vao;
+var program;
+
+//Collect shape information into neat package
+var shapes = {
+    solidoctahedron: { points: [], normals: [], start: 0, size: 0, type: 0 },
+    //EXERCISE: add an octahedron shape object here
+};
+
+//EXERCISE: use the octahedron definition below as an example to create your own octahedron
+//          beware of triangle point order - should be counterclockwise when viewed from front
+//          do not remove the octahedron.
+
+
+//Define points for a octahedron
+var octahedronVerts = [
+    vec4(-1, 0, 0,1), //0
+    vec4( 1, 0, 0,1), //1
+    vec4( 0,-1, 0,1), //2
+    vec4( 0, 1, 0,1), //3
+    vec4( 0, 0,-1,1), //4
+    vec4( 0, 0, 1,1), //5
+];
+
+// Looks  like D8 die
+//Solid octahedron lookups - these are indices into the octahedronVerts array
+var solidoctahedronLookups = [
+    1, 3, 5,//1
+    1, 5, 2,//2
+    2, 5, 0,//3
+    0, 5, 3,//4
+    0, 3, 4,//5
+    0, 4, 2,//6
+    4, 3, 1,//7
+    4, 1, 2//8
+];
+
+
+
+
+//Expand Solid octahedron data: 
+//  The precomputed normals used here are easy for octahedrons,
+//  But harder for other shapes. Consider using cross
+//  product per triangle instead. (See LE2.js for an example...)
+var faceNum = 0;
+var normalsList = [vec3( 0.0, 0.0, 1.0), vec3( 1.0, 0.0, 0.0), vec3( 0.0, 0.0,-1.0),
+                   vec3(-1.0, 0.0, 0.0), vec3( 0.0, 1.0, 0.0), vec3( 0.0,-1.0, 0.0)];
+for (var i = 0; i < solidoctahedronLookups.length; i++) {
+    shapes.solidoctahedron.points.push(octahedronVerts[solidoctahedronLookups[i]]);
+    shapes.solidoctahedron.normals.push(normalsList[faceNum]);
+}
+
+//EXERCISE: find the makeFlatNormals function in the lab notes
+//          place it here (or in uofrGraphics.js - it's a general use function)
+makeFlatNormals(shapes.solidoctahedron.points, 0, shapes.solidoctahedron.points.length, shapes.solidoctahedron.normals);
+
+function makeFlatNormals(triangles, start, num, normals) {
+   if (num % 3 != 0) {
+       console.log("Warning: number of vertices is not a multiple of 3");
+       return;
+   }
+   for (var i = start; i < start + num; i += 3) {
+       var p0 = vec3(triangles[i][0], triangles[i][1], triangles[i][2]);
+       var p1 = vec3(triangles[i + 1][0], triangles[i + 1][1], triangles[i + 1][2]);
+       var p2 = vec3(triangles[i + 2][0], triangles[i + 2][1], triangles[i + 2][2]);
+       var v1 = normalize(vec3(subtract(p1, p0))); //Vector on triangle edge one
+       var v2 = normalize(vec3(subtract(p2, p1))); //Vector on triangle edge two
+
+       var n = normalize(cross(v1, v2));
+       normals[i + 0] = vec3(n);
+       normals[i + 1] = vec3(n);
+       normals[i + 2] = vec3(n);
+   }
+}
+
+//Convenience function:
+//  - adds shape data to global points array
+//  - adds primitive type to a shape
+var points = [];
+var normals = [];
+function loadShape(myShape, type) {
+    myShape.start = points.length;
+    points = points.concat(myShape.points);
+    normals = normals.concat(myShape.normals);
+    myShape.size = myShape.points.length;
+    myShape.type = type;
+}
+
+var red =       vec4(1.0, 0.0, 0.0, 1.0);
+var green =     vec4(0.0, 1.0, 0.0, 1.0);
+var blue =      vec4(0.0, 0.0, 1.0, 1.0);
+var lightred =  vec4(1.0, 0.5, 0.5, 1.0);
+var lightgreen= vec4(0.5, 1.0, 0.5, 1.0);
+var lightblue = vec4(0.5, 0.5, 1.0, 1.0);
+var white =     vec4(1.0, 1.0, 1.0, 1.0);
+var black =     vec4(0.0, 0.0, 0.0, 1.0);
+
+
+//Variables for Transformation Matrices
+var mv = new mat4();
+var p = new mat4();
+var mvLoc, projLoc;
+
+
+//Interaction support variables
+var myX, myY, motion = false, animate = false;
+var octahedronRot = mat4();
+
+//Variables for Lighting
+var light;
+var material;
+var lighting;
+var uColor;
+
+
+
+//----------------------------------------------------------------------------
+// Initialization Event Function
+//----------------------------------------------------------------------------
+window.onload = function init() {
+    // Set up a WebGL Rendering Context in an HTML5 Canvas
+    canvas = document.getElementById("gl-canvas");
+    gl = canvas.getContext("webgl2"); // basic webGL2 context
+    if (!gl) {
+        canvas.parentNode.innerHTML("Cannot get WebGL2 Rendering Context");
+    }
+
+    //  Configure WebGL
+    //  eg. - set a clear color
+    //      - turn on depth testing
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST);
+
+    //  Load shaders and initialize attribute buffers
+    program = initShaders(gl, "Shaders/diffuse.vert", "Shaders/diffuse.frag");
+    gl.useProgram(program);
+
+    // Set up local data buffers
+    // Mostly done globally or with urgl in this program...
+    loadShape(shapes.solidoctahedron, gl.TRIANGLES);
+    //EXERCISE: add your octahedron data to the buffers with loadShape
+    
+    //Create a vertex array object to allow us to switch back to local
+    //data buffers after using uofrGraphics calls.
+    vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+
+    // Load the data into GPU data buffers and
+    // Associate shader attributes with corresponding data buffers
+    //***Vertices***
+    vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+    program.vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(program.vPosition, 4, gl.FLOAT, gl.FALSE, 0, 0);
+    gl.enableVertexAttribArray(program.vPosition);
+
+
+    //***Normals***
+    normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
+    program.vNormal = gl.getAttribLocation(program, "vNormal");
+    gl.vertexAttribPointer(program.vNormal, 3, gl.FLOAT, gl.FALSE, 0, 0);
+    gl.enableVertexAttribArray(program.vNormal);
+
+
+    // Get addresses of transformation uniforms
+    projLoc = gl.getUniformLocation(program, "p");
+    mvLoc = gl.getUniformLocation(program, "mv");
+
+    //Set up viewport
+    gl.viewportWidth = canvas.width;
+    gl.viewportHeight = canvas.height;
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
+    //Set up projection matrix
+    p = perspective(45.0, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+    gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(transpose(p)));
+
+
+    // Get  light uniforms
+    light = {};   // initialize this light object
+    light.diffuse = gl.getUniformLocation(program, "light.diffuse");
+    light.ambient = gl.getUniformLocation(program, "light.ambient");
+    light.position = gl.getUniformLocation(program, "light.position");
+
+
+    // Get material uniforms
+    material = {};
+    material.diffuse = gl.getUniformLocation(program, "material.diffuse");
+    material.ambient = gl.getUniformLocation(program, "material.ambient");
+
+    // Get and set other lighting state
+    // Enable Lighting
+    lighting = gl.getUniformLocation(program, "lighting");
+    gl.uniform1i(lighting, 1);
+
+    //Set color to use when lighting is disabled
+    uColor = gl.getUniformLocation(program, "uColor");
+    gl.uniform4fv(uColor, white);
+
+    //Set up uofrGraphics
+    urgl = new uofrGraphics(gl);
+    urgl.connectShader(program, "vPosition", "vNormal", "stub");
+
+    //Set up some mouse interaction
+    canvas.onmousedown = startDrag;
+    canvas.onmousemove = moveDrag;
+    canvas.onmouseup = endDrag;
+    canvas.ondblclick = resetoctahedron;
+
+    requestAnimationFrame(render);
+};
+
+
+
+//----------------------------------------------------------------------------
+// Rendering Event Function
+//----------------------------------------------------------------------------
+var rx = 0, ry = 0;
+function render() {
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
+    // Set up some default light properties
+    gl.uniform4f(light.diffuse, 1.0, 1.0, 1.0, 1.0);
+    gl.uniform4fv(light.ambient, vec4(0.2, 0.2, 0.2, 1.0));
+    gl.uniform4fv(light.position, vec4(0.0, 0.0, 1.0, 0.0));
+
+    //Set up some default material properties
+    gl.uniform4fv(material.diffuse, vec4(0.8, 0.8, 0.8, 1.0));
+    gl.uniform4fv(material.ambient, vec4(0.8, 0.8, 0.8, 1.0));
+
+
+    //Set initial view
+    var eye = vec3(0.0, 0.0, 10.0);
+    var at = vec3(0.0, 0.0, 0.0);
+    var up = vec3(0.0, 1.0, 0.0);
+
+    mv = lookAt(eye, at, up);
+
+    var octahedronTF = mult(mv, octahedronRot);
+    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(octahedronTF)));
+
+    //EXERCISE change this so it draws your octahedron
+    gl.drawArrays(shapes.solidoctahedron.type, shapes.solidoctahedron.start, shapes.solidoctahedron.size);
+
+    if (animate == true) {
+        octahedronRot = rotateX(rx);
+        octahedronRot = mult(octahedronRot, rotateY(ry));
+        rx += .8;
+        ry += 2.;
+    }
+    requestAnimationFrame(render);
+}
+
+
+//Mouse motion handlers
+function startDrag(e) {
+    myX = e.clientX;
+    myY = e.clientY;
+    motion = true;
+    animate = false;
+}
+
+function moveDrag(e) {
+    if (motion) {
+        var dX = e.clientX - myX;
+        var dY = (e.clientY) - myY;
+        myX = e.clientX;
+        myY = e.clientY;
+        var s = 1;
+        octahedronRot = mult(rotateX(dY * s), octahedronRot);
+        octahedronRot = mult(rotateY(dX * s), octahedronRot);
+    }
+}
+
+function endDrag(e) {
+    motion = false;
+}
+
+function resetoctahedron(e) {
+    animate = true;
+}
