@@ -286,7 +286,7 @@ function render() {
 
     //EXERCISE: put Diffuse and ambient light color settings here
     gl.uniform4fv(light.diffuse, green);
-    gl.uniform4fv(light.ambient, vec4(0.4, 0.4, 0.4, 1.0));
+    gl.uniform4fv(light.ambient, vec4(0.2, 0.2, 0.2, 1.0));
     
 
 
@@ -303,7 +303,7 @@ function render() {
     //////////
     //EXERCISE: set left sphere materials to red as instructed in exercise
     gl.uniform4fv(material.diffuse, red);
-    gl.uniform4fv(material.ambient, vec4(0.4, 0.4, 0.4, 1.0));
+    gl.uniform4fv(material.ambient, vec4(0.0, 0.0, 0.0, 1.0));
 
 
     var sphereTF = mult(mv, translate(-2, 0, 0));
@@ -313,7 +313,7 @@ function render() {
     ///////////
     //EXERCISE: set right sphere materials to green as instructed in exercise
     gl.uniform4fv(material.diffuse, green);
-    gl.uniform4fv(material.ambient, vec4(0.4, 0.4, 0.4, 1.0));
+    gl.uniform4fv(material.ambient, vec4(0.0, 0.0, 0.0, 1.0));
 
 
     sphereTF = mult(mv, translate(2, 0, 0));
