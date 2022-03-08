@@ -259,19 +259,36 @@ function render() {
     ///////////////////
     //Set up light properties here
 
-    //Defaults:
+
+    //Defaults: DIRECTIONAL
+    gl.uniform4fv(light.diffuse, vec4(0.8, 0.8, 0.8, 1.0));
+    gl.uniform4fv(light.ambient, vec4(0.2, 0.2, 0.2, 1.0));
+    var lpos = vec4(0.0, 0.0, 1.0, 0.0);
+    //lpos = mult(mv, lpos);
+    gl.uniform4fv(light.position, lpos); 
+
+    /*
+    //QUESTION 4 EXERCISE: put Positional light position settings here
+    gl.uniform4fv(light.diffuse, vec4(0.8, 0.8, 0.8, 1.0));
+    gl.uniform4fv(light.ambient, vec4(0.2, 0.2, 0.2, 1.0));
+    var lpos = vec4(0.0, 1.0, 0.0, 1.0);
+    lpos = mult(mv, lpos);
+    gl.uniform4fv(light.position, lpos);
+    */
+
+    /*
+    //QUESTION 3 EXERCISE: put Directional light position settings here
     gl.uniform4fv(light.diffuse, vec4(0.8, 0.8, 0.8, 1.0));
     gl.uniform4fv(light.ambient, vec4(0.2, 0.2, 0.2, 1.0));
     var lpos = vec4(0.0, 0.0, 1.0, 0.0);
     gl.uniform4fv(light.position, lpos);
-
-    //EXERCISE: put Positional light position settings here
-
-
-    //EXERCISE: put Directional light position settings here
-
+    */
 
     //EXERCISE: put Diffuse and ambient light color settings here
+    gl.uniform4fv(light.diffuse, green);
+    gl.uniform4fv(light.ambient, vec4(0.4, 0.4, 0.4, 1.0));
+    
+
 
 
     //set cube materials to white
@@ -285,6 +302,8 @@ function render() {
 
     //////////
     //EXERCISE: set left sphere materials to red as instructed in exercise
+    gl.uniform4fv(material.diffuse, red);
+    gl.uniform4fv(material.ambient, vec4(0.4, 0.4, 0.4, 1.0));
 
 
     var sphereTF = mult(mv, translate(-2, 0, 0));
@@ -293,6 +312,8 @@ function render() {
 
     ///////////
     //EXERCISE: set right sphere materials to green as instructed in exercise
+    gl.uniform4fv(material.diffuse, green);
+    gl.uniform4fv(material.ambient, vec4(0.4, 0.4, 0.4, 1.0));
 
 
     sphereTF = mult(mv, translate(2, 0, 0));

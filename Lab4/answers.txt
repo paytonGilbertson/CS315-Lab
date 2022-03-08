@@ -1,0 +1,5 @@
+2. It is directional. This is because the "w" value of lpos is 0.
+3. c) This makes the produced canvas the same as the default lighting settings. Lighting and positioning is the same.
+3. f) It did not make a difference. Since we are looking at the world from the positive z axis, by multiplying mv and lpos there is no change in the position of lighting so it remains the same.
+5. E2P3 and E2P4 appear identical. E2P5 and E2P6 both use positional lighting rather than directional. In E2P5, the light is set relative to the view. In E2P6, it is modified by the world matrix (mv) so the light appears above the scene. 
+6. 
