@@ -20,6 +20,7 @@ struct _light
   vec4 spotdirection;
   //EXERCISE 2: Add attenuation coefficients here
   // (tip: pack all three coefficients into a vec3)
+  vec3 attenuation;
 };
 
 struct _material
@@ -33,7 +34,7 @@ struct _material
 
 //lighting constants
 //EXERCISE 3: set the number of lights to 2
-const int nLights = 1; // number of lights
+const int nLights = 2; // number of lights
 
 //lighting uniforms
 uniform bool lighting;  // to enable and disable lighting
@@ -79,7 +80,9 @@ void main()
 
     //EXERCISE 3: loop through all the lights (not just light[0]
     //            and accumulate their returned rgb values in color.
-    color.rgb += lightCalc(light[0]);
+    for (int i = 0; i < nLights; i++){
+      color.rgb += lightCalc(light[i]);
+    }
   }
   /// End Color Calculation ///
 
@@ -99,8 +102,9 @@ vec3 lightCalc(in _light light)
   {
     L = normalize(light.position.xyz - mvPosition.xyz);
     //EXERCISE 2: Calculate distance from mvPosition to light position
+    float dist = length(light.position.xyz - mvPosition.xyz);
     //EXERCISE 2: Calculate attenuation
-
+    attenuation = 1.0/(light.attenuation.x + light.attenuation.y * dist + light.attenuation.z * dist * dist);
   }
 
 
@@ -132,5 +136,6 @@ vec3 lightCalc(in _light light)
   //** Stupid RGB color inspectors... **
   color = color/255./255.;
 
+  color = color * attenuation;
   return color;
 }

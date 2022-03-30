@@ -123,6 +123,7 @@ window.onload = function init() {
    light = [];
    //EXERCISE 2: Add an attenuation property. I suggest the follosing values:
    //            quadratic: 0.5 linear: 0 constant: 0.3
+   attenuation = vec3(0.5, 0, 0.3);
    light[0] =  {diffuse: white, specular: white, ambient: vec3(50,50,50), 
                 position: vec4(0,0,-2,1)};
    
@@ -130,6 +131,7 @@ window.onload = function init() {
    //            Make it any colour you like but you'll have to 
    //            adjust the lamp to match...
    //            You can set position here or in render().
+   light[1] = {diffuse: blue, specular: blue, ambient: lightblue, position: vec4(1, 2, 0, 1)}
 
    //////////////////////////
    // Initialize material object
@@ -183,13 +185,14 @@ function getAndSetShaderLocations()
    //            Unfortunately, there's no easy way to learn the value
    //            of a constant in a shader, and the size of an array in
    //            glsl must be constant. 
-   var i = 0;
+   for (var i = 0; i < 2; i++) 
    {
       light[i].diffuseLoc = gl.getUniformLocation(program, "light[" + i + "].diffuse");
       light[i].specularLoc = gl.getUniformLocation(program, "light[" + i + "].specular");
       light[i].ambientLoc = gl.getUniformLocation(program, "light[" + i + "].ambient");
       light[i].positionLoc = gl.getUniformLocation(program, "light[" + i + "].position");
       //EXERCISE 2: get attenuation coefficients location
+      light[i].attenuationLoc = gl.getUniformLocation(program, "light[" + i + "].attenuation");
    }
 
    // Get  material uniform locations
@@ -273,6 +276,7 @@ function setLight(light, matrix)
    gl.uniform3fv(light.specularLoc, light.specular);
    gl.uniform4fv(light.positionLoc, mult(mv,light.position));
    //EXERCISE 2: send attenuation coefficients to shader
+   gl.uniform3fv(light.attenuationLoc, light.attenuation);
 }
 
 //----------------------------------------------------------------------------
@@ -297,8 +301,11 @@ function render()
 
    //Position Light 1 in World space
    //EXERCISE 3: set light[1]'s position to match the top of the lamp post
+   light[1].position = lamppost.position;
    //EXERCISE 3: send light[1] to the setLight function, and also send the
    //            the mv matrix to help place it in World space
+   //setLight(light[1]);
+
    
    var batmanTF = mult(mv, mult(translate(0, -1, 0), rotateY(ry)));
    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(transpose(batmanTF)));
