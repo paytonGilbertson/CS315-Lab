@@ -1,0 +1,1 @@
+All three images work on my computer. WebGL only allows images with dimensions that are a power of 2, so the 500x500 image would be invalid.

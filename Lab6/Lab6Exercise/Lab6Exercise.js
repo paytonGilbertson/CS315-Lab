@@ -152,6 +152,7 @@ function setUpTextures()
     // Get image
     var image = document.getElementById("pic1");
     
+    
     // Load image into texture object
     gl.texImage2D(gl.TEXTURE_2D,     // 2D texture
                  0,                 // level of detail 0 (full or no mipmap)
@@ -349,5 +350,62 @@ document.onkeydown = function handleKeyDown(event) {
     if (key == "A")
     {
         anim = !anim;
+    }
+
+    //Cat 1
+    if(key == "S")
+    {
+        image = document.getElementById("pic1");
+        gl.texImage2D(gl.TEXTURE_2D,     // 2D texture
+        0,                 // level of detail 0 (full or no mipmap)
+        gl.RGB,	        // internal format - how GL will store tex.
+        gl.RGB,            // format of image data in memory
+        gl.UNSIGNED_BYTE,  // data type of image data in memory
+        image              // image itself - size is determined automatically
+        );
+    }
+
+    //Cat 2
+    if(key == "D")
+    {
+        image = document.getElementById("pic2");
+        gl.texImage2D(gl.TEXTURE_2D,     // 2D texture
+        0,                 // level of detail 0 (full or no mipmap)
+        gl.RGB,	        // internal format - how GL will store tex.
+        gl.RGB,            // format of image data in memory
+        gl.UNSIGNED_BYTE,  // data type of image data in memory
+        image              // image itself - size is determined automatically
+        );
+    }
+
+    //Cat 3
+    if (key == "F")
+    {
+        image = document.getElementById("pic3");
+        gl.texImage2D(gl.TEXTURE_2D,     // 2D texture
+        0,                 // level of detail 0 (full or no mipmap)
+        gl.RGB,	        // internal format - how GL will store tex.
+        gl.RGB,            // format of image data in memory
+        gl.UNSIGNED_BYTE,  // data type of image data in memory
+        image              // image itself - size is determined automatically
+        );
+    }
+
+    //Tiled view
+    if (key == "G")
+    {
+        //min = -1;
+        //max = 2;
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    }
+
+    //Clamped view
+    if (key == "H")
+    {
+        //min = 1;
+        //max = 3;
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
 }
